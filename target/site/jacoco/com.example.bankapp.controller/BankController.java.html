@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BankController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">bankapp</a> &gt; <a href="index.source.html" class="el_package">com.example.bankapp.controller</a> &gt; <span class="el_source">BankController.java</span></div><h1>BankController.java</h1><pre class="source lang-java linenums">package com.example.bankapp.controller;
+
+import com.example.bankapp.model.Account;
+import com.example.bankapp.service.AccountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.math.BigDecimal;
+
+@Controller
+<span class="nc" id="L16">public class BankController {</span>
+
+    @Autowired
+    private AccountService accountService;
+
+    @GetMapping(&quot;/dashboard&quot;)
+    public String dashboard(Model model) {
+<span class="nc" id="L23">        String username = SecurityContextHolder.getContext().getAuthentication().getName();</span>
+<span class="nc" id="L24">        Account account = accountService.findAccountByUsername(username);</span>
+<span class="nc" id="L25">        model.addAttribute(&quot;account&quot;, account);</span>
+<span class="nc" id="L26">        return &quot;dashboard&quot;;</span>
+    }
+
+    @GetMapping(&quot;/register&quot;)
+    public String showRegistrationForm() {
+<span class="nc" id="L31">        return &quot;register&quot;;</span>
+    }
+
+    @PostMapping(&quot;/register&quot;)
+    public String registerAccount(@RequestParam String username, @RequestParam String password, Model model) {
+        try {
+<span class="nc" id="L37">            accountService.registerAccount(username, password);</span>
+<span class="nc" id="L38">            return &quot;redirect:/login&quot;;</span>
+<span class="nc" id="L39">        } catch (RuntimeException e) {</span>
+<span class="nc" id="L40">            model.addAttribute(&quot;error&quot;, e.getMessage());</span>
+<span class="nc" id="L41">            return &quot;register&quot;;</span>
+        }
+    }
+
+    @GetMapping(&quot;/login&quot;)
+    public String login() {
+<span class="nc" id="L47">        return &quot;login&quot;;</span>
+    }
+
+    @PostMapping(&quot;/deposit&quot;)
+    public String deposit(@RequestParam BigDecimal amount) {
+<span class="nc" id="L52">        String username = SecurityContextHolder.getContext().getAuthentication().getName();</span>
+<span class="nc" id="L53">        Account account = accountService.findAccountByUsername(username);</span>
+<span class="nc" id="L54">        accountService.deposit(account, amount);</span>
+<span class="nc" id="L55">        return &quot;redirect:/dashboard&quot;;</span>
+    }
+
+    @PostMapping(&quot;/withdraw&quot;)
+    public String withdraw(@RequestParam BigDecimal amount, Model model) {
+<span class="nc" id="L60">        String username = SecurityContextHolder.getContext().getAuthentication().getName();</span>
+<span class="nc" id="L61">        Account account = accountService.findAccountByUsername(username);</span>
+
+        try {
+<span class="nc" id="L64">            accountService.withdraw(account, amount);</span>
+<span class="nc" id="L65">        } catch (RuntimeException e) {</span>
+<span class="nc" id="L66">            model.addAttribute(&quot;error&quot;, e.getMessage());</span>
+<span class="nc" id="L67">            model.addAttribute(&quot;account&quot;, account);</span>
+<span class="nc" id="L68">            return &quot;dashboard&quot;;</span>
+<span class="nc" id="L69">        }</span>
+
+<span class="nc" id="L71">        return &quot;redirect:/dashboard&quot;;</span>
+    }
+
+    @GetMapping(&quot;/transactions&quot;)
+    public String transactionHistory(Model model) {
+<span class="nc" id="L76">        String username = SecurityContextHolder.getContext().getAuthentication().getName();</span>
+<span class="nc" id="L77">        Account account = accountService.findAccountByUsername(username);</span>
+<span class="nc" id="L78">        model.addAttribute(&quot;transactions&quot;, accountService.getTransactionHistory(account));</span>
+<span class="nc" id="L79">        return &quot;transactions&quot;;</span>
+    }
+
+    @PostMapping(&quot;/transfer&quot;)
+    public String transferAmount(@RequestParam String toUsername, @RequestParam BigDecimal amount, Model model) {
+<span class="nc" id="L84">        String username = SecurityContextHolder.getContext().getAuthentication().getName();</span>
+<span class="nc" id="L85">        Account fromAccount = accountService.findAccountByUsername(username);</span>
+
+        try {
+<span class="nc" id="L88">            accountService.transferAmount(fromAccount, toUsername, amount);</span>
+<span class="nc" id="L89">        } catch (RuntimeException e) {</span>
+<span class="nc" id="L90">            model.addAttribute(&quot;error&quot;, e.getMessage());</span>
+<span class="nc" id="L91">            model.addAttribute(&quot;account&quot;, fromAccount);</span>
+<span class="nc" id="L92">            return &quot;dashboard&quot;;</span>
+<span class="nc" id="L93">        }</span>
+
+<span class="nc" id="L95">        return &quot;redirect:/dashboard&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
