@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_abhay45451_Liquibase_mysql_java_1736800837542-push-trigger-input-set
+  identifier: Build_abhay45451_Liquibase_mysql_java_1736800837542pushtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: Liquibase_mysql
+  pipeline:
+    identifier: Build_abhay45451_Liquibase_mysql_java_1736800837542
+    properties:
+      ci:
+        codebase:
+          build:
+            type: branch
+            spec:
+              branch: <+trigger.branch>
